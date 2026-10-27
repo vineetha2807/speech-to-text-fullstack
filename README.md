@@ -10,7 +10,7 @@ A web application that converts speech into text in real time and stores transcr
 
 ## Features
 - Real-time speech transcription
-- Multilingual support (if configured)
+- Multilingual support
 - Save and view transcription history
 
 ## How to Run
