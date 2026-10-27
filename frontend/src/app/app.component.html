@@ -1,0 +1,104 @@
+<div class="page">
+  <header class="topbar">
+    <div class="brand-mark">ST</div>
+    <div class="brand-copy">
+      <strong>Speech Studio</strong>
+      <span>Real-time transcription workspace</span>
+    </div>
+    <span class="tech-pill">Spring Boot · Angular · PostgreSQL</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">VOICE → TEXT</p>
+      <h1>Turn your voice into <span>searchable text.</span></h1>
+      <p class="subhead">Capture speech, save your notes, and manage every transcription in one place.</p>
+    </section>
+
+    <section class="workspace">
+      <div class="panel composer">
+        <div class="section-heading">
+          <div><span class="step">01</span><h2>Live transcription</h2></div>
+          <span class="live-dot" [class.active]="isListening">{{ isListening ? 'LISTENING' : 'READY' }}</span>
+        </div>
+        <div class="controls">
+          <label>Recognition language
+            <select [(ngModel)]="language" [disabled]="isListening">
+              <option value="hi-IN">Hindi (हिन्दी)</option>
+              <option value="en-IN">English (India)</option>
+              <option value="en-US">English (US)</option>
+            </select>
+          </label>
+          <label>Title
+            <input [(ngModel)]="title" placeholder="e.g. Daily stand-up notes" maxlength="160">
+          </label>
+        </div>
+
+        <div class="mic-area">
+          <button class="mic-button" [class.recording]="isListening" (click)="isListening ? stopListening() : startListening()" [attr.aria-label]="isListening ? 'Stop listening' : 'Start listening'">
+            <span>{{ isListening ? 'Ⅱ' : '🎙' }}</span>
+          </button>
+          <strong>{{ isListening ? 'Listening to your voice' : 'Ready when you are' }}</strong>
+          <p>{{ isListening ? 'Speak clearly. Your words will appear below.' : 'Press the microphone to begin.' }}</p>
+        </div>
+
+        <label class="transcript-label">Transcript <span>Live preview</span></label>
+        <div class="transcript-box" [class.has-text]="displayedText">
+          <textarea [(ngModel)]="finalText" placeholder="Your recognized words will appear here. You can also type or correct text manually." rows="6"></textarea>
+          <div class="interim" *ngIf="interimText">{{ interimText }}</div>
+          <div class="empty-hint" *ngIf="!displayedText">Waiting for speech input…</div>
+        </div>
+        <div class="notice error" *ngIf="error">{{ error }}</div>
+        <div class="notice success">{{ status }}</div>
+        <div class="form-actions">
+          <button class="button secondary" (click)="resetForm()">Clear</button>
+          <button class="button primary" (click)="save()" [disabled]="busy || !finalText.trim()">
+            {{ busy ? 'Saving…' : editingId === null ? 'Save transcription ↗' : 'Update transcription ↗' }}
+          </button>
+        </div>
+        <p class="disclaimer">Microphone recognition depends on browser support and language availability. Use localhost or HTTPS and grant microphone permission.</p>
+      </div>
+
+      <aside class="side-column">
+        <div class="panel mini-panel">
+          <span class="mini-icon">✦</span>
+          <h3>Designed for your workflow</h3>
+          <p>Keep voice notes organized with titles, timestamps, search, and simple editing.</p>
+          <div class="feature"><span>✓</span> Live speech preview</div>
+          <div class="feature"><span>✓</span> Persistent database history</div>
+          <div class="feature"><span>✓</span> Full CRUD operations</div>
+        </div>
+        <div class="panel tip-panel">
+          <strong>Quick tip</strong>
+          <p>For Hindi-English mixed speech, recognition quality varies by browser and model. Try Hindi or English (India) and verify the saved text before submitting.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="history-section">
+      <div class="history-heading">
+        <div><p class="eyebrow">YOUR LIBRARY</p><h2>Transcription history</h2></div>
+        <div class="search-box"><span>⌕</span><input [(ngModel)]="search" (keyup.enter)="load()" placeholder="Search transcriptions…"><button (click)="load()">Search</button></div>
+      </div>
+      <div class="history-count">{{ records.length }} {{ records.length === 1 ? 'record' : 'records' }}</div>
+      <div class="empty-state" *ngIf="records.length === 0">
+        <div class="empty-symbol">▤</div><strong>No transcriptions yet</strong><p>Your saved voice notes will appear here.</p>
+      </div>
+      <div class="record-list" *ngIf="records.length > 0">
+        <article class="record" *ngFor="let item of records">
+          <div class="record-icon">Aa</div>
+          <div class="record-content">
+            <div class="record-title-row"><h3>{{ item.title }}</h3><span class="language-tag">{{ item.language }}</span></div>
+            <p>{{ item.content }}</p>
+            <small>Saved {{ item.createdAt | date:'medium' }}</small>
+          </div>
+          <div class="record-actions">
+            <button class="icon-button" (click)="edit(item)" title="Edit transcription">✎</button>
+            <button class="icon-button delete" (click)="remove(item)" title="Delete transcription">⌫</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer>Speech Studio <span>·</span> Built with Java, Angular & PostgreSQL</footer>
+</div>
